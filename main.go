@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/hust-tianbo/game_account/internal"
 	"net/http"
 )
 
@@ -26,7 +28,9 @@ func main() {
 func GetHttpServerMux() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("welcome to account"))
+		res := internal.CheckAuth()
+		resBytes, _ := json.Marshal(res)
+		w.Write([]byte(resBytes))
 	})
 	return mux
 }
