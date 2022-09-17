@@ -3,8 +3,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hust-tianbo/game_account/internal"
+	"io/ioutil"
 	"net/http"
+
+	"github.com/hust-tianbo/game_account/internal/logic"
+	"github.com/hust-tianbo/go_lib/log"
 )
 
 const (
@@ -28,8 +31,16 @@ func main() {
 func GetHttpServerMux() *http.ServeMux {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		res := internal.CheckAuth()
-		resBytes, _ := json.Marshal(res)
+		body, _ := ioutil.ReadAll(r.Body)
+		var req logic.CheckAuthReq
+		json.Unmarshal(body, &req)
+		var rsp logic.CheckAuthRsp
+		defer func() {
+			log.Debugf("[GetHttpServerMux]deal log:%+v,%+v", req, rsp)
+		}()
+
+		rsp = logic.CheckAuth(req)
+		resBytes, _ := json.Marshal(rsp)
 		w.Write([]byte(resBytes))
 	})
 	return mux
