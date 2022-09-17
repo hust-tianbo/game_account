@@ -16,7 +16,7 @@ func init() {
 
 	// 连接db
 	var err error
-	db, err = gorm.Open("mysql", "root:1023564552tbd@tcp(172.16.0.8:3306)/account_token?charset=utf8&parseTime=True&loc=Local")
+	db, err = gorm.Open("mysql", "root:1023564552tbd@tcp(172.16.0.8:3306)/account?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
 		panic(err)
 	}
