@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/hust-tianbo/game_account/config"
+
 	"github.com/hust-tianbo/game_account/internal/logic"
 	"github.com/hust-tianbo/go_lib/log"
 )
@@ -17,6 +19,7 @@ const (
 func main() {
 	//modbus.get()
 	fmt.Printf("begin account server")
+	config.InitConfig()
 
 	// 注册http接口
 	mux := GetHttpServerMux()

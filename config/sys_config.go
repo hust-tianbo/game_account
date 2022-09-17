@@ -26,6 +26,10 @@ func (d *YamlNodeDecoder) Decode(conf interface{}) error {
 	return d.Node.Decode(conf)
 }
 
+func InitConfig() bool {
+	return true
+}
+
 func init() {
 	yamlFile, err := ioutil.ReadFile("sys.yaml")
 	if err != nil {
