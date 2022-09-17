@@ -6,6 +6,8 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/hust-tianbo/game_account/client"
+
 	"github.com/hust-tianbo/game_account/internal/model"
 	"github.com/hust-tianbo/go_lib/log"
 	"github.com/jinzhu/gorm"
@@ -13,8 +15,8 @@ import (
 
 const (
 	RetSuccess       = 0
-	RetNotValidCode  = -10000
-	RetInternalError = -10001
+	RetNotValidCode  = -10000 // 微信code校验失败
+	RetInternalError = -10001 // 内部异常
 )
 
 var TokenValidDuration = 5 * time.Minute // token有效时长5分钟
@@ -73,13 +75,20 @@ func GeneInternalToken() string {
 }
 
 // 客户端是否携带有效的code
-func IsCodeValid(req *CheckAuthReq) (string, string, bool) {
+func IsCodeValid(req *CheckAuthReq) (string, string, string, bool) {
 	if req.Code == "" {
 		log.Errorf("[IsCodeValid]code is invalid:%+v", req)
-		return "", "", false
+		return "", "", "", false
 	}
 
-	return "openid_test", "session_key_test", true
+	session, sessionErr := client.CodeToSession(req.Code)
+	if sessionErr != nil {
+		log.Errorf("[IsCodeValid]CodeToSession failed:%+v,%+v", req, sessionErr)
+		return "", "", "", false
+	}
+
+	log.Debugf("[IsCodeValid]code is valid:%+v,%+v", req, session)
+	return session.Openid, session.SessionKey, session.Unionid, true
 }
 
 func CheckAuth(req CheckAuthReq) CheckAuthRsp {
@@ -88,7 +97,7 @@ func CheckAuth(req CheckAuthReq) CheckAuthRsp {
 		return CheckAuthRsp{Ret: RetSuccess, InternalToken: req.InternalToken, PersonID: req.PersonID}
 	}
 	// 根据code换取票据，如果没有code，则提示错误
-	openid, sessionKey, isValid := IsCodeValid(&req)
+	openid, sessionKey, unionID, isValid := IsCodeValid(&req)
 	if !isValid {
 		return CheckAuthRsp{
 			Ret: RetNotValidCode,
@@ -120,6 +129,7 @@ func CheckAuth(req CheckAuthReq) CheckAuthRsp {
 			CTime:             nowTime,
 			MTime:             nowTime,
 			PersonID:          personId,
+			Unionid:           unionID,
 		})
 	} else {
 		personId = ele.PersonID

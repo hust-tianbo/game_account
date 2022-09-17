@@ -13,4 +13,5 @@ type AccountToken struct {
 	CTime             time.Time `gorm:"column:c_time"`
 	MTime             time.Time `gorm:"column:m_time"`
 	PersonID          string    `gorm:"column:person_id"`
+	Unionid           string    `gorm:"column:unionid"`
 }
