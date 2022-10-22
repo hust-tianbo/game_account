@@ -63,8 +63,8 @@ func IsInternalTokenValid(req *CheckAuthReq) bool {
 // 生成用户id
 func GenePersonid() string {
 	time := time.Now()
-	randInt := rand.Intn(10000)
-	return fmt.Sprintf("%+v%+v", time.UnixNano(), randInt)
+	randInt := rand.Intn(1000)
+	return fmt.Sprintf("%+v%+03d", time.Unix(), randInt)
 }
 
 // 生成内部票据
