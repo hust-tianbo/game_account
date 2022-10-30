@@ -9,8 +9,12 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var GConfig *SystemConfig
+
 type SystemConfig struct {
-	Log map[string]yaml.Node `yaml:"log"` // 日志配置
+	APPID     string               `yaml:"app_id"`
+	APPSecret string               `yaml:"app_secret"`
+	Log       map[string]yaml.Node `yaml:"log"` // 日志配置
 }
 
 type YamlNodeDecoder struct {
@@ -39,16 +43,15 @@ func init() {
 	}
 
 	fmt.Printf("[ReadConfig]read sys config success:%+v\n", string(yamlFile))
-	config := &SystemConfig{}
 
-	unmarshalErr := yaml.Unmarshal(yamlFile, config)
+	unmarshalErr := yaml.Unmarshal(yamlFile, GConfig)
 	if unmarshalErr != nil {
 		fmt.Errorf("[ReadConfig]unmarshal failed:%+v", unmarshalErr)
 		panic("unmarshal failed")
 		return
 	}
 
-	for name, node := range config.Log {
+	for name, node := range GConfig.Log {
 		fmt.Printf("[ReadConfig]Setup log\n:%+v", name)
 		log.DefaultLogFactory.Setup(name, &YamlNodeDecoder{Node: &node})
 	}
