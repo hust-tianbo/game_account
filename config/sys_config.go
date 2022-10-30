@@ -9,7 +9,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-var GConfig *SystemConfig
+var GConfig *SystemConfig = &SystemConfig{}
 
 type SystemConfig struct {
 	APPID     string               `yaml:"app_id"`
