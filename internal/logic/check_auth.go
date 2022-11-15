@@ -113,7 +113,7 @@ func CheckAuth(req CheckAuthReq) CheckAuthRsp {
 
 	var ele model.AccountToken
 	var dbRes *gorm.DB
-	dbRes = db.Table(model.AccountTokenTable).Where(&model.AccountToken{Openid: openid, SessionKey: sessionKey}).First(&ele)
+	dbRes = db.Table(model.AccountTokenTable).Where(&model.AccountToken{Openid: openid}).First(&ele)
 	if dbRes.Error != nil && !dbRes.RecordNotFound() {
 		log.Errorf("[CheckAuth]read table failed:%+v,%+v", req, dbRes.Error)
 		return CheckAuthRsp{
@@ -137,8 +137,8 @@ func CheckAuth(req CheckAuthReq) CheckAuthRsp {
 		personId = ele.PersonID
 		// 如果已经存在用户，则直接更新内部票据
 		dbRes = db.Table(model.AccountTokenTable).
-			Where(&model.AccountToken{Openid: openid, SessionKey: sessionKey}).Update(map[string]interface{}{
-			"internal_token": internalToken, "internal_token_time": nowTime, "m_time": nowTime})
+			Where(&model.AccountToken{Openid: openid}).Update(map[string]interface{}{
+			"internal_token": internalToken, "internal_token_time": nowTime, "m_time": nowTime, "session_key": sessionKey})
 	}
 
 	if dbRes.Error != nil || dbRes.RowsAffected != 1 {
