@@ -25,6 +25,7 @@ type CheckAuthReq struct {
 	PersonID      string `json:"personid"`
 	Code          string `json:"code"`           // 平台返回的code码
 	InternalToken string `json:"internal_token"` // 如果已经有内部票据，则携带
+	ReturnWXToken bool   `json:"return_wxtoken"`
 }
 
 type CheckAuthRsp struct {
@@ -32,6 +33,7 @@ type CheckAuthRsp struct {
 	Msg           string `json:"msg"`            // 错误信息
 	InternalToken string `json:"internal_token"` // 内部票据
 	PersonID      string `json:"personid"`       // 内部id
+	WXToken       string `json:"wxtoken"`
 }
 
 // 内部票据
@@ -148,9 +150,15 @@ func CheckAuth(req CheckAuthReq) CheckAuthRsp {
 
 	log.Debugf("[CheckAuth]update table success:%+v", req)
 	// 生成内部登录态并返回
-	return CheckAuthRsp{
+
+	// 组装回包
+	rsp := CheckAuthRsp{
 		Ret:           RetSuccess,
 		InternalToken: internalToken,
 		PersonID:      personId,
 	}
+	if req.ReturnWXToken {
+		rsp.WXToken = openid
+	}
+	return rsp
 }
